@@ -1,0 +1,162 @@
+VERBOSE_LEVEL
+ALL ALL /
+
+MODEL
+COMPOSITIONAL MOLAR 2
+/
+
+WELL_RATES_AT
+RC /
+
+DIMENS
+46 46 30 
+/
+
+INCLUDE
+depth.in /
+/
+
+INCLUDE
+dx.in /
+/
+
+INCLUDE
+dy.in /
+/
+
+INCLUDE
+dz.in /
+/
+
+INCLUDE
+permx.in /
+/
+
+INCLUDE
+permy.in /
+/
+
+INCLUDE
+permz.in /
+/
+
+INCLUDE
+poro.in /
+/
+
+MINPV
+1e-3 FIX
+/
+
+COMPS
+nCO2 nH20
+/
+
+ACF
+0.225 0.344 
+/
+
+PCRIT
+7.2800000E+01 217.6 
+/
+
+VCRIT
+9.4000000E-02 0.056 
+/
+
+TCRIT
+3.0420000E+02 647.3 
+/
+
+MW
+4.4010000E+01 18.015
+/
+
+BIC
+-0.075
+/
+
+ZI 
+.001 0.999
+/
+
+ROCK
+68.9476 5.8e-7 /
+/
+
+INCLUDE
+relperm.in /
+/
+
+RTEMP
+372
+/
+
+PRESSURE
+124
+/
+
+SCOND
+1.0135 288.89 0 /
+/
+
+OUTPUT
+HDF5 TIME "Output"
+/
+
+WELSPECS
+W001 * 23 24 0/
+W002 * 23 24 0/
+W003 * 23 24 0/
+W004 * 23 24 0/
+/
+
+COMPDAT
+W001	23	25	25	25	OPEN	*	     2.9796 	4*	Y /
+W001	23	26	25	25	OPEN	*	     2.9796 	4*	Y /
+W001	23	27	25	25	OPEN	*	     2.9796 	4*	Y /
+W002	24	24	25	25	OPEN	*	     2.9796 	4*	X /
+W002	25	24	25	25	OPEN	*	     2.9796 	4*	X /
+W002	26	24	25	25	OPEN	*	     2.9796 	4*	X /
+W002	27	24	25	25	OPEN	*	     2.9796 	4*	X /
+W002	28	24	25	25	OPEN	*	     2.9796 	4*	X /
+W003	23	23	25	25	OPEN	*	     2.9796	4*	Y /
+W003	23	22	25	25	OPEN	*	     2.9796 	4*	Y /
+W003	23	21	25	25	OPEN	*	     2.9796 	4*	Y /
+W003	23	20	25	25	OPEN	*	     2.9796 	4*	Y /
+W003	23	19	25	25	OPEN	*	     2.9796 	4*	Y /
+W004	22	24	25	25	OPEN	*	     2.9796 	4*	X /
+W004	21	24	25	25	OPEN	*	     2.9796 	4*	X /
+W004	20	24	25	25	OPEN	*	     2.9796	4*	X /
+/
+
+WELLSTRE
+W001 0.999 0.001 /
+W002 0.999 0.001 /
+W003 0.999 0.001 /
+W004 0.999 0.001 /
+/
+
+TUNING
+.001 100 0 1.5 
+/
+NONLINEAR
+APPL 1e-4 20 /
+/
+
+EOS
+PR 1e-12 1e-6/
+/
+
+LINEAR
+GMRES_CPR0 1e-4 40
+/
+
+FACILITY
+1e-3 30 1e+10 /
+/
+
+INCLUDE
+wells_&P1.in /
+
+end

@@ -1,0 +1,48 @@
+SIMULATOR
+   gprs.in
+/
+OPTDIMS
+-- # iter   # simulat
+     0         100     /
+OPTPARS
+-- Bottom hole pressure control parameters
+   WGIR W001 100   200  /
+   WGIR W002 100   200  /
+   WGIR W003 100   200  /
+   WGIR W004 100   200  /
+/
+OPTFUNC
+-- Component  Domain       Discount
+     FOPT     FIELD    30    0.0 /
+     FGPT     FIELD    -2    0.0 /
+     FGIT     FIELD /
+/
+
+--OPTCONS
+-- Constr  Constr Constr Constr
+-- Mnemon  Domain  Type   Value
+--    WGPR     *      <      1e3   /
+--    WOPR     *	    <      3e3   /
+--/
+--OPTTUNE
+--                    Tolerances                      Scaling
+--  feasibil  objective   dual   control   boundary
+--      1e-1       1e-4     1e-1     1e-1      1e-1        1    /
+--..\..\Optimization\input\ipopt.opt  /
+OPTOPTS
+-- 1. IPOPT, SNOPT
+-- 2. DISCRETE_(AD,FD), CONTINUOUS_(AD,FD), FINITE_DIFFERENCES
+-- 3. (PARDISO, SUPERLU)_TRANSPOSE,
+--    SCHUR_PARDISO
+--    SCHUR_KRYLOV_(GMRES, BICGSTAB, CGS)@(RIGHT, LEFT)+CPR_(AMG, SAMG, PARDISO)
+  SNOPT   DISCRETE_AD
+--  SUPERLU_TRANSPOSE
+    SCHUR_KRYLOV_GMRES@RIGHT+CPR_PARDISO
+/
+OPTFOUT
+RAW_CTRLS JAC ACCUM/
+OPTCHCK
+--  # tests  freq        perturbation
+--                    value     tol    type
+    0      0          0      1e-4    F/
+END
