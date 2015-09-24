@@ -1,7 +1,9 @@
-function [] = flashCal(caseDir, isTPWL, isPOD, schedule, trainingSchedule, caseName)
+function [] = flashCal(caseDir, isTPWL, isPOD, schedule, trainingSchedule, caseName, templateDir)
 ioDir = [caseDir 'data/'];
 flashDir = [caseDir 'schedule_flash/'];
 exeDir = '..\..\excutable\'; % relative to schedule_flash
+% setup flash folder
+flashSetup(templateDir, flashDir);
 % start flash
 fprintf(['flash for schedule ', int2str(schedule),':\n']);
 eval(['load ' ioDir caseName '.mat']);
@@ -43,6 +45,16 @@ else % full order model reference solution
     eval(['save -v7.3 ' ioDir 'full_well_' int2str(schedule) ' wellVar time']);
 end
 fprintf(['flash ',int2str(schedule),' finished!\n']);
+end
+
+function [] = flashSetup(templateDir, flashDir)
+system(['rm -rf ' flashDir]);
+system(['mkdir ' flashDir]);
+system(['cp ' templateDir 'flash.sh ' flashDir]);
+system(['cp ' templateDir '*.in ' flashDir]);
+system(['rm ' flashDir 'gprs_template.in']);
+system(['rm ' flashDir 'opt.in']);
+system(['rm ' flashDir 'wells_*.in']);             % no need
 end
 
 function [oData] = doFlash(flashDir, exeDir, ctrlVar, WBstateRecord, WBindices, ...

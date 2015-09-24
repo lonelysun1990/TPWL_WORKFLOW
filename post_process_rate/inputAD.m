@@ -21,6 +21,8 @@ for iSchedule = 1: length(schedule)
     system(['mkdir ' caseDir scheduleDir]);
     system(['cp ' templateDir '*.sh ' caseDir scheduleDir]);
     system(['cp ' templateDir '*.in ' caseDir scheduleDir]);
+    system(['rm ' caseDir scheduleDir 'gprs_flash.in']);
+    system(['rm ' caseDir scheduleDir 'flash.sh']); % no need
     inputModify(schedule(iSchedule), caseDir, scheduleDir);
 end
 end

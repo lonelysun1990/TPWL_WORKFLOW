@@ -3,11 +3,11 @@ function [] = controlCenter()
 clear *;
 clc;
 %% switches
-loadTraining = 1;
-loadFullOrder = 1;
-reRunTraining = 1;
-reRunFullOrder = 1;
-isPOD = 1;
+loadTraining = 0;
+loadFullOrder = 0;
+reRunTraining = 0;
+reRunFullOrder = 0;
+isPOD = 0;
 isTPWL = 1;
 isPS = 1; % point selection
 isTPWLfull = 0;
@@ -29,7 +29,7 @@ trainingAD(loadTraining, reRunTraining, caseDir, caseName, ...
 fullTestAD(loadFullOrder, reRunFullOrder, caseDir, targetSchedule, ...
     caseName, templateDir);
 runPOD(isPOD, caseDir, caseName, trainingSchedule);
-runTPWL(isTPWL, isPS, caseDir, trainingSchedule, targetSchedule, caseName);
+runTPWL(isTPWL, isPS, caseDir, trainingSchedule, targetSchedule, caseName, templateDir);
 runTPWLfull(isTPWLfull, caseDir, trainingSchedule, targetSchedule, caseName);
 plotResult(isPlotResult, caseDir, caseName, targetSchedule, trainingSchedule);
 end
@@ -53,7 +53,7 @@ if loadTraining % load training data
             readJacobi_attemp(caseName, trainingSchedule(iCase), caseDir);
         end
         % flash calculation
-        flashCal(caseDir, 0, 0, trainingSchedule(iCase), 0, caseName);
+        flashCal(caseDir, 0, 0, trainingSchedule(iCase), 0, caseName, templateDir);
     end
 end
 toc
@@ -69,7 +69,7 @@ if loadFullOrder
     for iCase = 1 : size(targetSchedule)
         scheduleDir = ['target_',int2str(iCase),'/']; % just for now
         readHDF_attemp(0, targetSchedule(iCase), caseDir, scheduleDir, caseName);
-        flashCal(caseDir, 0, 0, targetSchedule, 0, caseName);
+        flashCal(caseDir, 0, 0, targetSchedule, 0, caseName, templateDir);
     end 
 end
 end
@@ -84,7 +84,7 @@ if isPOD
 end
 end
 
-function [] = runTPWL(isTPWL, isPS, caseDir, trainingSchedule, targetSchedule, caseName)
+function [] = runTPWL(isTPWL, isPS, caseDir, trainingSchedule, targetSchedule, caseName, templateDir)
 % TPWL
 if isTPWL
     fprintf('TPWL:\n');
@@ -93,7 +93,7 @@ if isTPWL
     toc
     fprintf('TPWL flash:\n');
     tic
-    flashCal(caseDir, 1, 1, targetSchedule, trainingSchedule, caseName);
+    flashCal(caseDir, 1, 1, targetSchedule, trainingSchedule, caseName, templateDir);
     toc
 end
 
@@ -103,7 +103,7 @@ function [] = runTPWLfull(isTPWLfull, caseDir, trainingSchedule, targetSchedule,
 % TPWL with full order, no POD
 if isTPWLfull
     TPWL_direct(caseDir, trainingSchedule, targetSchedule);
-    flashCal(caseDir, 1, 0, targetSchedule, trainingSchedule, caseName);
+    flashCal(caseDir, 1, 0, targetSchedule, trainingSchedule, caseName, templateDir);
 end
 end
 
