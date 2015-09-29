@@ -1,0 +1,46 @@
+WCONINJE
+W001   GAS   OPEN  RATE 1.67e5 2* /
+W002   GAS   OPEN  RATE 1.67e5 2* /
+W003   GAS   OPEN  RATE 6.08e5 2* /
+W004   GAS   OPEN  RATE 6.08e5 2* /
+/
+
+TSTEP
+2*1000
+/
+
+WCONINJE
+W001   GAS   OPEN  RATE 8.35e5 2* /
+W002   GAS   OPEN  RATE 1.67e5 2* /
+W003   GAS   OPEN  RATE 1.67e5 2* /
+W004   GAS   OPEN  RATE 5.01e5 2* /
+/
+
+TSTEP
+3*1000
+/
+
+WCONINJE
+W001   GAS   OPEN  RATE 5.01e5 2* /
+W002   GAS   OPEN  RATE 6.08e5 2* /
+W003   GAS   OPEN  RATE 3.34e5 2* /
+W004   GAS   OPEN  RATE 1.67e5 2* /
+/
+
+TSTEP
+23*100
+/
+-- total 20 years
+
+-- shut well for 3,700 days
+WCONINJE
+W001   GAS   OPEN  RATE 0 2* /
+W002   GAS   OPEN  RATE 0 2* /
+W003   GAS   OPEN  RATE 0 2* /
+W004   GAS   OPEN  RATE 0 2* /
+/
+
+TSTEP
+37*100
+/
+-- total 30 years

@@ -1,0 +1,149 @@
+VERBOSE
+ALL BRIEF /
+
+MODEL
+MOLAR COMPOSITIONAL ISOTHERMAL  2 
+/
+
+DIMENS
+46 30 1
+/
+
+INCLUDE
+depth.in /
+/
+
+INCLUDE
+vol.in /
+/
+
+TRANX
+1.0 /
+
+TRANY
+1.0 /
+
+TRANZ
+1.0 /
+
+INCLUDE
+&tranx.in /
+/
+
+INCLUDE
+&trany.in /
+/
+
+INCLUDE
+&tranz.in /
+/
+
+INCLUDE
+poro.in /
+/
+
+MINPV
+1e-3 FIX
+/
+
+COMPS
+nCO2 nH20
+/
+
+ACF
+0.225 0.344 
+/
+
+PCRIT
+7.2800000E+01 217.6 
+/
+
+VCRIT
+9.4000000E-02 0.056 
+/
+
+TCRIT
+3.0420000E+02 647.3 
+/
+
+MW
+4.4010000E+01 18.015
+/
+
+BIC
+-0.075
+/
+
+ZI 
+0.001 0.999
+/
+
+ROCK
+68.9476 5.8e-7 /
+/
+
+INCLUDE
+relperm_old.in /
+/
+
+RTEMP
+372
+/
+
+PRESSURE
+124
+/
+
+SCOND
+1.0135 288.89 0 /
+/
+
+OUTPUT
+HDF5 TIME "Output"
+/
+
+WELSPECS
+W001 * 17 25 0/
+W002 * 30 25 0/
+/
+
+COMPDAT
+W001	17	25	1	1	OPEN	*	     2.9796 	4*	X /
+W001	18	25	1	1	OPEN	*	     2.9796 	4*	X /
+W001	19	25	1	1	OPEN	*	     2.9796 	4*	X /
+W002	28	25	1	1	OPEN	*	     2.9796 	4*	X /
+W002	29	25	1	1	OPEN	*	     2.9796 	4*	X /
+W002	30	25	1	1	OPEN	*	     2.9796 	4*	X /
+/
+
+WELLSTRE
+W001 0.999 0.001 /
+W002 0.999 0.001 /
+/
+
+TUNING
+1 100 0 1.5 
+/
+
+NONLINEAR
+APPL 1e-4 20 /
+/
+
+EOS
+PR 1e-12 1e-6/
+/
+
+LINEAR
+GMRES_CPR0 1e-4 40 /
+/
+
+FACILITY
+1e-3 30 1e+10 /
+/
+
+INCLUDE
+wells_&P1.in /
+
+end
+
+

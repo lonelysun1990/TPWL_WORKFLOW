@@ -1,0 +1,16 @@
+WCONINJE
+W001   GAS   OPEN    BHP   2*  170.000000 / 
+W002   GAS   OPEN    BHP   2*  210.000000 / 
+W003   GAS   OPEN    BHP   2*  170.000000 / 
+W004   GAS   OPEN    BHP   2*  210.000000 / 
+/
+
+TSTEP 
+1 /
+
+END
+
+TSTEP
+1*1000 
+/
+end

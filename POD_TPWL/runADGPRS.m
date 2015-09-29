@@ -1,4 +1,4 @@
-function [finished] = runADGPRS(isTraining, schedule, caseDir)
+function [finished] = runADGPRS(isTraining, schedule, caseDir, exeDir)
 % schedule here is a vector
 % check which system we are in
 [~, k2] = system('uname -a'); 
@@ -7,7 +7,7 @@ function [finished] = runADGPRS(isTraining, schedule, caseDir)
 if strfind(k2, 'Linux') % Linux OS
     [jobID, jobStatus] = runAD_linux(isTraining, schedule, caseDir);
 elseif strfind(k4, 'Microsoft Windows')% Windows OS
-    jobStatus = runAD_win(isTraining, schedule, caseDir);
+    jobStatus = runAD_win(isTraining, schedule, caseDir, exeDir);
 end
 
 %% check the status
@@ -17,9 +17,9 @@ end
 end
 
 % no backward compatibility yet
-function [jobStatus] = runAD_win(isTraining, schedule, caseDir)
+function [jobStatus] = runAD_win(isTraining, schedule, caseDir, exeDir)
 jobStatus = zeros(length(schedule),1);
-exeDir = '..\..\ADGPRS\'; % relative to schedule dir
+% exeDir = '..\..\ADGPRS\'; % relative to schedule dir
 % job status: 0 for un-finished jobs, 1 for finished jobs
 for iCase = 1: size(jobStatus,1)
     fprintf(['Run Win AD-GPRS schedule ',int2str(schedule(iCase)),':\n']);

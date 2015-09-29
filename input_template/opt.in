@@ -1,0 +1,11 @@
+SIMULATOR
+   gprs.in
+/
+
+OPTPARS
+-- Bottom hole pressure control parameters
+   TRAN  0:1379    0      10000 /
+/
+OPTFOUT
+RAW_CTRLS JAC ACCUM/
+END

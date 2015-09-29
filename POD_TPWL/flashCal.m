@@ -1,7 +1,7 @@
-function [] = flashCal(caseDir, isTPWL, isPOD, schedule, trainingSchedule, caseName, wellSchedule)
+function [] = flashCal(caseDir, isTPWL, isPOD, schedule, trainingSchedule, caseName, wellSchedule, exeDir)
 ioDir = [caseDir 'data/'];
 flashDir = [caseDir 'schedule_flash/'];
-exeDir = '..\..\ADGPRS\';
+% exeDir = '..\..\ADGPRS\';
 % start flash
 fprintf(['flash for schedule ', int2str(schedule),':\n']);
 eval(['load ' ioDir caseName '.mat']);

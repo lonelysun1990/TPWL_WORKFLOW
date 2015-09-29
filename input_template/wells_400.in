@@ -1,0 +1,179 @@
+WCONINJE
+W001   GAS   OPEN    BHP   2*  190.000000 / 
+W002   GAS   OPEN    BHP   2*  190.000000 / 
+W003   GAS   OPEN    BHP   2*  190.000000 / 
+W004   GAS   OPEN    BHP   2*  190.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+WCONINJE
+W001   GAS   OPEN    BHP   2*  195.000000 / 
+W002   GAS   OPEN    BHP   2*  195.000000 / 
+W003   GAS   OPEN    BHP   2*  195.000000 / 
+W004   GAS   OPEN    BHP   2*  195.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+WCONINJE
+W001   GAS   OPEN    BHP   2*  200.000000 / 
+W002   GAS   OPEN    BHP   2*  200.000000 / 
+W003   GAS   OPEN    BHP   2*  200.000000 / 
+W004   GAS   OPEN    BHP   2*  200.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+WCONINJE
+W001   GAS   OPEN    BHP   2*  205.000000 / 
+W002   GAS   OPEN    BHP   2*  205.000000 / 
+W003   GAS   OPEN    BHP   2*  205.000000 / 
+W004   GAS   OPEN    BHP   2*  205.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+WCONINJE
+W001   GAS   OPEN    BHP   2*  210.000000 / 
+W002   GAS   OPEN    BHP   2*  210.000000 / 
+W003   GAS   OPEN    BHP   2*  210.000000 / 
+W004   GAS   OPEN    BHP   2*  210.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+WCONINJE
+W001   GAS   OPEN    BHP   2*  215.000000 / 
+W002   GAS   OPEN    BHP   2*  215.000000 / 
+W003   GAS   OPEN    BHP   2*  215.000000 / 
+W004   GAS   OPEN    BHP   2*  215.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+WCONINJE
+W001   GAS   OPEN    BHP   2*  220.000000 / 
+W002   GAS   OPEN    BHP   2*  220.000000 / 
+W003   GAS   OPEN    BHP   2*  220.000000 / 
+W004   GAS   OPEN    BHP   2*  220.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+WCONINJE
+W001   GAS   OPEN    BHP   2*  225.000000 / 
+W002   GAS   OPEN    BHP   2*  225.000000 / 
+W003   GAS   OPEN    BHP   2*  225.000000 / 
+W004   GAS   OPEN    BHP   2*  225.000000 / 
+/
+
+TSTEP
+1*1000 
+/
+
+-- main injection 8,000 days end
+
+-- well shut for 9,000 days
+WCONINJE
+W001   GAS   OPEN  RATE 0 2* /
+W002   GAS   OPEN  RATE 0 2* /
+W003   GAS   OPEN  RATE 0 2* /
+W004   GAS   OPEN  RATE 0 2* /
+/
+
+TSTEP
+9*1000 
+/
+-- total 17,000 days
+
+-- re-open for 100 days
+WCONINJE
+W001   GAS   OPEN  RATE 1 2* /
+W002   GAS   OPEN  RATE 1 2* /
+W003   GAS   OPEN  RATE 1 2* /
+W004   GAS   OPEN  RATE 1 2* /
+/
+
+TSTEP
+1*100 
+/
+
+WCONINJE
+W001   GAS   OPEN  RATE 0 2* /
+W002   GAS   OPEN  RATE 0 2* /
+W003   GAS   OPEN  RATE 0 2* /
+W004   GAS   OPEN  RATE 0 2* /
+/
+
+TSTEP
+9*100 
+/
+
+-- well shut for 9,000 days
+WCONINJE
+W001   GAS   OPEN  RATE 0 2* /
+W002   GAS   OPEN  RATE 0 2* /
+W003   GAS   OPEN  RATE 0 2* /
+W004   GAS   OPEN  RATE 0 2* /
+/
+
+TSTEP
+9*1000 
+/
+-- total 27,000
+
+-- re-open for 100 days
+WCONINJE
+W001   GAS   OPEN  RATE 1 2* /
+W002   GAS   OPEN  RATE 1 2* /
+W003   GAS   OPEN  RATE 1 2* /
+W004   GAS   OPEN  RATE 1 2* /
+/
+
+TSTEP
+1*100 
+/
+
+WCONINJE
+W001   GAS   OPEN  RATE 0 2* /
+W002   GAS   OPEN  RATE 0 2* /
+W003   GAS   OPEN  RATE 0 2* /
+W004   GAS   OPEN  RATE 0 2* /
+/
+
+TSTEP
+9*100 
+/
+
+-- well shut for 9,000 days
+WCONINJE
+W001   GAS   OPEN  RATE 0 2* /
+W002   GAS   OPEN  RATE 0 2* /
+W003   GAS   OPEN  RATE 0 2* /
+W004   GAS   OPEN  RATE 0 2* /
+/
+
+TSTEP
+9*1000 
+/
+-- total 37,000 days
+end
+
+
+
+

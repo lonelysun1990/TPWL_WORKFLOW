@@ -1,5 +1,5 @@
 function [] = inputADGPRS(isTraining, schedule, caseDir, wellSchedule, templateDir)
-templateDir = 'input_template\';
+% templateDir = 'input_template\';
 %% check system
 [~, k2] = system('uname -a'); 
 [~, k4] = system('ver');
