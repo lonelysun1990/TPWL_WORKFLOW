@@ -4,10 +4,10 @@ clear *;
 clc;
 %% switches
 loadTraining = 0;
-loadFullOrder = 0;
+loadFullOrder = 1;
 reRunTraining = 0;
 reRunFullOrder = 0;
-isPOD = 0;
+isPOD = 1;
 isTPWL = 1;
 isPS = 1; % point selection
 isTPWLfull = 0;
@@ -20,8 +20,8 @@ caseName = 'CO2_2COMP';
 % caseName = 'CO2_SYN';
 caseDir = [rootDir caseName '/'];
 templateDir = ['../input_template/' caseName '/'];
-trainingSchedule = [500, 510];
-targetSchedule = 520;
+trainingSchedule = [700, 710];
+targetSchedule = 720;
 
 %% operations
 trainingAD(loadTraining, reRunTraining, caseDir, caseName, ...

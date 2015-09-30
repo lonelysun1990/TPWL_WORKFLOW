@@ -1,24 +1,33 @@
 % generate well control
 function [] = ctrlGen()
+% directories
 rootDir = '../rate_control/';
-caseName = 'CO2_SYN';
+
+%
+% caseName = 'CO2_SYN';
+caseName = 'CO2_2COMP';
+%
 caseDir = [rootDir caseName '/'];
-ioDir = [caseDir, 'data/'];
-schedule = 810;
-nWells = 2;
+templateDir = ['../input_template/' caseName '/'];
+iDir = ['../model_data/' caseName '/well/'];
+oDir = [caseDir, 'data/'];
+%
+schedule = 800;
+nWells = 4;
 interNum = 8;% number of interval
 ctrlMode = 'rate';
 genCtrl = 'file_percent'; % 1. file; 2. pattern generate; 
 totalRate = 3255*3; % 8974.68; % reservoir m3/day
-[interLen, ctrlParam] = patternGen(ioDir, genCtrl, interNum, nWells, totalRate);
-inputAD(caseDir, ctrlMode, ctrlParam, schedule, nWells, interLen);
-matFile(ioDir, interLen, ctrlParam, ctrlMode, schedule);
+[interLen, ctrlParam] = patternGen(iDir, genCtrl, interNum, nWells, totalRate);
+inputAD(templateDir, ctrlMode, ctrlParam, schedule, nWells, interLen);
+matFile(oDir, interLen, ctrlParam, ctrlMode, schedule);
+wellScheduleLog();
 end
 
-function [interLen, ctrlParam] = patternGen(ioDir, genCtrl, interNum, nWells, totalRate)
+function [interLen, ctrlParam] = patternGen(iDir, genCtrl, interNum, nWells, totalRate)
 
 if strcmp(genCtrl, 'file')
-    eval(['load ' ioDir 'well_input.txt']);
+    eval(['load ' iDir 'well_input.txt']);
     if size(well_input, 2) - 1 == nWells
         interLen = well_input(:,end);
         ctrlParam = well_input(:,1:end-1);
@@ -26,7 +35,7 @@ if strcmp(genCtrl, 'file')
         error('Number of wells mismatch!');
     end
 elseif strcmp(genCtrl, 'file_percent')
-    eval(['load ' ioDir 'well_input.txt']);
+    eval(['load ' iDir 'well_input.txt']);
     if size(well_input, 2) - 1 == nWells
         interLen = well_input(:,end);
         ctrlParam = totalRate * well_input(:,1:end-1);
@@ -38,7 +47,7 @@ else
 end
 end
 
-function [] = inputAD(caseDir, ctrlMode, ctrlParam, schedule, nWells, interLen)
+function [] = inputAD(templateDir, ctrlMode, ctrlParam, schedule, nWells, interLen)
 head_str = {'WCONINJE\n'};
 wellNames = nameWell(size(ctrlParam, 2));
 well_str = {'\tGAS\tOPEN\tRATE\t', ' 2* /\n'};
@@ -54,14 +63,14 @@ for iInter = 1: size(interLen, 1)
     str_master = strcat(str_master, head_str, ctrl_str, time_str);
 end
 str_master = strjoin(str_master);
-f_input = fopen([caseDir, 'input_template/wells_' int2str(schedule) '.in'], 'w');
+f_input = fopen([templateDir, 'wells_' int2str(schedule) '.in'], 'w');
 fprintf(f_input, str_master);
 fclose(f_input);
 end
 
-function matFile(ioDir, interLen, ctrlParam, ctrlMode, schedule)
+function matFile(iDir, interLen, ctrlParam, ctrlMode, schedule)
 ctrl = cat(2, ctrlParam, interLen);
-eval(['save -v7.3 ' ioDir, 'wellCtrl_' int2str(schedule) ' ctrlMode ctrl']);
+eval(['save -v7.3 ' iDir, 'wellCtrl_' int2str(schedule) ' ctrlMode ctrl']);
 end
 
 function [wellNames] = nameWell(nWells)

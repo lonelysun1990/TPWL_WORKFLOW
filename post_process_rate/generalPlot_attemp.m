@@ -95,7 +95,7 @@ end
 if isDiff ~= 1
     caxis([0,0.75]); % 1.0 %0.75
 else
-    caxis([0,0.25]); % 0.05
+    caxis([0,0.05]); % 0.05
 end
 colorbar;
 % eval(['saveas(figureID, ' '''' oputDir '\' caseName '_' axis '_' int2str(slice) ...
