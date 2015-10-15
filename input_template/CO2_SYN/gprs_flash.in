@@ -1,107 +1,81 @@
 VERBOSE_LEVEL
 ALL ALL /
-
 MODEL
 COMPOSITIONAL MOLAR 2
 /
-
 WELL_RATES_AT
 RC /
 
 DIMENS
-46 46 100
+39 39 200 
+/
+DEPTH
+--1521*1000
+--1521*1010
+--1521*1020
+--1521*1030
+--1521*1040
+--1521*1050
+--1521*1060
+--1521*1170
+--1521*1180
+--1521*1190
+1000
 /
 --INCLUDE
---depth.in /
+--tranx.in /
 --/
-DEPTH
-1 /
-
-DX
-1 /
-
-DY 
-1 /
-
-DZ
-1 /
-
 --INCLUDE
---dx.in /
+--trany.in /
 --/
-
 --INCLUDE
---dy.in /
+--tranz.in /
 --/
-
 --INCLUDE
---dz.in 
+--vol.in /
 --/
-
-PERMX
-1 /
-
-PERMY
-1 /
-
-PERMZ
-1 /
-    
---INCLUDE
---permx.in /
---/
-
---INCLUDE
---permy.in /
---/
-
---INCLUDE
---permz.in /
---/
-
-PORO
-0.2 /
-
 --INCLUDE
 --poro.in /
 --/
 
+TRANX
+1 /
+TRANY
+1 /
+TRANZ
+1 /
+VOLUME
+1 /
+PORO
+0.2 /
+
 MINPV
 1e-3 FIX
 /
-
 COMPS
 nCO2 nH20
 /
-
 ACF
 0.225 0.344 
 /
-
 PCRIT
 7.2800000E+01 217.6 
 /
-
 VCRIT
 9.4000000E-02 0.056 
 /
-
 TCRIT
 3.0420000E+02 647.3 
 /
-
 MW
 4.4010000E+01 18.015
 /
-
 BIC
--0.075
+0.075 
 /
-
 ZI 
 .001 0.999
 /
-
 ROCK
 68.9476 5.8e-7 /
 /
@@ -112,10 +86,20 @@ RTEMP
 372
 /
 PRESSURE
-124 /
+--1521*170
+--1521*170.983
+--1521*171.966
+--1521*172.950
+--1521*173.933
+--1521*174.916
+--1521*175.900
+--1521*176.883
+--1521*177.866
+--1521*178.850
+170
 /
 SCOND
-1.0135 288.89 /
+1.0135 288.89 0 /
 /
 OUTPUT
 HDF5 TIME "Output"

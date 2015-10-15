@@ -9,62 +9,43 @@ WELL_RATES_AT
 RC /
 
 DIMENS
-46 46 100
+46 46 30
 /
---INCLUDE
---depth.in /
---/
-DEPTH
-1 /
-
-DX
-1 /
-
-DY 
-1 /
-
-DZ
-1 /
-
---INCLUDE
---dx.in /
---/
-
---INCLUDE
---dy.in /
---/
-
---INCLUDE
---dz.in 
---/
-
-PERMX
-1 /
-
-PERMY
-1 /
-
-PERMZ
-1 /
+INCLUDE
+depth.in /
+/
     
---INCLUDE
---permx.in /
---/
+INCLUDE
+dx.in /
+/
 
---INCLUDE
---permy.in /
---/
+INCLUDE
+dy.in /
+/
 
---INCLUDE
---permz.in /
---/
+INCLUDE
+dz.in 
+/
 
-PORO
-0.2 /
+INCLUDE
+depth.in /
+/
+    
+INCLUDE
+permx.in /
+/
 
---INCLUDE
---poro.in /
---/
+INCLUDE
+permy.in /
+/
+
+INCLUDE
+permz.in /
+/
+
+INCLUDE
+poro.in /
+/
 
 MINPV
 1e-3 FIX

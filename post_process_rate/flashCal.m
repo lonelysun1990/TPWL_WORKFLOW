@@ -11,40 +11,60 @@ if isTPWL
     eval(['load ' ioDir 'stateVariable_' int2str(trainingSchedule(1)) '.mat time WBindices']);
     if isPOD
         eval(['load ' ioDir 'priVarTPWL_' int2str(schedule) ...
-            ' WBstateRecord WBvariables']);
+            ' stateRecord WBstateRecord WBvariables']);
     else
         eval(['load ' ioDir 'TPWL_direct_' int2str(schedule) ...
-            ' WBstateRecord WBvariables']);
+            ' stateRecord WBstateRecord WBvariables']);
     end
 else % full order model reference solution
-    eval(['load ' ioDir 'stateVariable_' int2str(schedule) '.mat WBstate WBvariables WBindices time']);
+    eval(['load ' ioDir 'stateVariable_' int2str(schedule) '.mat snapShots WBstate WBvariables WBindices time']);
     WBstateRecord = WBstate;
 end
 
 %% data preparation
 nComp = caseObj.nComp;
 nWellBlock = size(WBvariables, 1) / nComp;
+nCell = caseObj.res_x * caseObj.res_y * caseObj.res_z;
+% cellIndices = (1:nCell)';
 nWell = caseObj.nWell;
 temperature = caseObj.temp; % K
 WIs = caseObj.WIs;
 wellPerf = caseObj.nWellPerf;
 timeStep = size(WBstateRecord, 2);
+% mobility_layer = 15;
 
 %% flash workflow
 [oDataRC] = doFlash(flashDir, exeDir, 'RC', WBstateRecord, WBindices, ...
     nComp, nWellBlock, temperature, timeStep);
 [oDataSC] = doFlash(flashDir, exeDir, 'SC', WBstateRecord, WBindices, ...
     nComp, nWellBlock, temperature, timeStep);
+% get total mobility of the layer
+% if isTPWL
+%     [layerStateRecord, layerIndices] = layerSelect(stateRecord, mobility_layer, caseObj);
+% else
+%     [layerStateRecord, layerIndices] = layerSelect(snapShots, mobility_layer, caseObj);
+% end
+% [resDataRC] = doFlash(flashDir, exeDir, 'RC', layerStateRecord, layerIndices, ...
+%     nComp, caseObj.res_x*caseObj.res_y, temperature, timeStep);
+% get well information
 [wellCtrl, ctrlMode] = scheduleConvert(ioDir, schedule, time);
 % wellVar = wellRate(oDataRC, oDataSC,  nWell, timeStep, WI, nComp, wellCtrl, ctrlMode);
 wellVar = wellRate_ResCond(oDataRC, oDataSC,  nWell, timeStep, WIs, nComp, ...
     wellCtrl, ctrlMode, wellPerf);
-if isTPWL
+if isTPWL % TPWL
     eval(['save -v7.3 ' ioDir 'recon_well_' int2str(schedule) ' wellVar time']);
+%     eval(['save -v7.3 ' ioDir 'priVarTPWL_' int2str(schedule) ' resDataRC -append']);
 else % full order model reference solution
     eval(['save -v7.3 ' ioDir 'full_well_' int2str(schedule) ' wellVar time']);
+%     eval(['save -v7.3 ' ioDir 'stateVariable_' int2str(schedule) ' resDataRC -append']);
 end
 fprintf(['flash ',int2str(schedule),' finished!\n']);
+end
+
+function [layerStateRecord, layerIndices] = layerSelect(stateRecord, mobility_layer, caseObj)
+layerIndices = (caseObj.res_x * caseObj.res_y*(mobility_layer -1)+1:caseObj.res_x * caseObj.res_y*mobility_layer)';
+temp_index = reshape([layerIndices*2-1, layerIndices*2]',[], 1);
+layerStateRecord = stateRecord(temp_index,:);
 end
 
 function [] = flashSetup(templateDir, flashDir)

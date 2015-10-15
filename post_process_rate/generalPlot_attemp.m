@@ -49,6 +49,10 @@ centerMapPlot(oputDir, 1, 1, caseName, trainDiff, caseObj.dx, caseObj.dy,...
 centerMapPlot(oputDir, isTraining, 1, caseName, testDiff, caseObj.dx, caseObj.dy,...
     caseObj.dz, caseObj.cen_x, caseObj.cen_y, caseObj.cen_z, axis, slice, ...
     comp, plot_time_step, plotTime, schedule);
+
+%% plot the total mobility
+mobilityPlot()
+
 end
 end
 
@@ -71,21 +75,23 @@ set(0, 'DefaultAxesFontSize', 20);
 figureID = figure();
 if axis == 'x'
     var_map = reshape(center_res_data(comp,slice,:,:,plot_time_step),cen_y, cen_z);
-    imagesc(dy,dz,var_map');
+    [var_map_alt, dz_alt] = interpZ(var_map, dz, dy);
+    imagesc(dy,dz_alt,var_map_alt);
     set(figureID, 'PaperUnits', 'inches', 'PaperPosition', [0,0,7,3]);
-    xlabel('z (meter)');
-    ylabel('y (meter)');
+    xlabel('x (meter)');
+    ylabel('z (meter)');
 elseif axis == 'y'
     var_map = reshape(center_res_data(comp,:,slice,:,plot_time_step),cen_x, cen_z);
-    imagesc(dx,dz,var_map');
+    [var_map_alt, dz_alt] = interpZ(var_map, dz, dx);
+    imagesc(dx,dz_alt,var_map_alt);
     set(figureID, 'PaperUnits', 'inches', 'PaperPosition', [0,0,7,3]);
-    xlabel('z (meter)');
-    ylabel('x (meter)');
+    xlabel('x (meter)');
+    ylabel('z (meter)');
 elseif axis == 'z'
     var_map = reshape(center_res_data(comp,:,:,slice,plot_time_step),cen_x, cen_y);
     imagesc(dx,dy,var_map');
-    xlabel('y (meter)');
-    ylabel('x (meter)'); 
+    xlabel('x (meter)');
+    ylabel('y (meter)'); 
 else
     disp('Map plotting failure! Please specify axis.');
     close(figureID);
@@ -95,7 +101,7 @@ end
 if isDiff ~= 1
     caxis([0,0.75]); % 1.0 %0.75
 else
-    caxis([0,0.05]); % 0.05
+    caxis([0,0.10]); % 0.05
 end
 colorbar;
 % eval(['saveas(figureID, ' '''' oputDir '\' caseName '_' axis '_' int2str(slice) ...
@@ -110,6 +116,17 @@ if isDiff
     figure_name = [figure_name '_diff'];
 end
 eval(['print -dpng -r300 -cmyk -zbuffer ' figure_name '.png']);
+end
+
+function [var_map_alt, dz_alt] = interpZ(var_map, dz, dxy)
+z_layer = 200;
+dz_alt = 0:sum(dz)/(z_layer-1):sum(dz);
+cum_z = reshape([cumsum(dz), cumsum(dz)+0.0001]',[],1);
+cum_z = [0;cum_z(1:end-1)];
+var_map_temp = reshape([var_map; var_map],length(dxy), 2*length(dz));
+[XY, Z] = meshgrid(dxy, cum_z);
+[XYq, Zq] = meshgrid(dxy, dz_alt);
+var_map_alt = interp2(XY,Z,var_map_temp',XYq,Zq);
 end
 
 function [] = wellRatePlot(oputDir, caseName, wellRate, time, schedule)

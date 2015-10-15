@@ -4,27 +4,27 @@ function [] = ctrlGen()
 rootDir = '../rate_control/';
 
 %
-% caseName = 'CO2_SYN';
-caseName = 'CO2_2COMP';
+caseName = 'CO2_SYN';
+% caseName = 'CO2_2COMP';
 %
 caseDir = [rootDir caseName '/'];
 templateDir = ['../input_template/' caseName '/'];
 iDir = ['../model_data/' caseName '/well/'];
 oDir = [caseDir, 'data/'];
 %
-schedule = 800;
-nWells = 4;
+schedule = 2014;
+nWells = 2;
 interNum = 8;% number of interval
 ctrlMode = 'rate';
 genCtrl = 'file_percent'; % 1. file; 2. pattern generate; 
-totalRate = 3255*3; % 8974.68; % reservoir m3/day
-[interLen, ctrlParam] = patternGen(iDir, genCtrl, interNum, nWells, totalRate);
+totalRate = 3255; % 8974.68; % reservoir m3/day
+[interLen, ctrlParam, well_input] = patternGen(iDir, genCtrl, interNum, nWells, totalRate);
 inputAD(templateDir, ctrlMode, ctrlParam, schedule, nWells, interLen);
 matFile(oDir, interLen, ctrlParam, ctrlMode, schedule);
-wellScheduleLog();
+wellScheduleLog(iDir, schedule, ctrlMode, well_input, totalRate);
 end
 
-function [interLen, ctrlParam] = patternGen(iDir, genCtrl, interNum, nWells, totalRate)
+function [interLen, ctrlParam, well_input] = patternGen(iDir, genCtrl, interNum, nWells, totalRate)
 
 if strcmp(genCtrl, 'file')
     eval(['load ' iDir 'well_input.txt']);
@@ -79,3 +79,15 @@ for iWell = 1: nWells
     wellNames = cat(2, wellNames, {['W00' int2str(iWell)]});
 end
 end
+
+function [] = wellScheduleLog(iDir, schedule, ctrlMode, well_input, param)
+f_input = fopen([iDir, 'well_schedule_log.txt'], 'a');
+time_var = clock;
+fprintf(f_input, '%s %d:%d:%d\t schedule: %d\t contrl mode: %s\t %d\n', date, time_var(4), time_var(5), floor(time_var(6)), schedule, ctrlMode, param);
+fprintf(f_input, [repmat('%f\t', 1, size(well_input, 2)) '\n'], well_input');
+fprintf(f_input, '\n\n');
+fclose(f_input);
+end
+
+
+
