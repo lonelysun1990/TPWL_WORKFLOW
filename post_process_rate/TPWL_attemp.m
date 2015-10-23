@@ -55,27 +55,79 @@ stateRecord = phi * rStateRecord;
 WBstateRecord = stateRecord(WBvariables,:);
 end
 
+% old point selection
+% function [selectPoint] = pointSelection(isPS, iStep, psRecord, trainPVI, targetPVI, rBasis, stateReduced) % retrive this
+% % control parameters
+% range = 10; % n points in front, n points back
+% weightPVI = 1e5; % weight of PVI over reduced states
+% epsilon = 1e-3;
+% 
+% if isPS
+%     selRange = rangeSelection(range, iStep, size(rBasis, 2));   
+%     trainState = [weightPVI*trainPVI(selRange)' /(targetPVI(iStep) + epsilon); ...
+%         rBasis(:,selRange') ./ (sum(stateReduced) + epsilon) ];
+%     targetState = [weightPVI*targetPVI(iStep) /(targetPVI(iStep) + epsilon); ...
+%         stateReduced ./ (sum(stateReduced) + epsilon)];
+%     tempDist = dist([targetState,trainState]); % Q by Q matrix
+%     distance = tempDist(1,2:end); % first row of dist matrix
+%     [~, min_index] = min(distance);
+%     selectPoint = selRange(min_index);
+%     selectPoint = stuckAvoid(psRecord, selectPoint, iStep, size(rBasis, 2));
+% else
+%     selectPoint = iStep;
+% end
+% end
+
 function [selectPoint] = pointSelection(isPS, iStep, psRecord, trainPVI, targetPVI, rBasis, stateReduced)
 % control parameters
-range = 10; % n points in front, n points back
-weightPVI = 1e5; % weight of PVI over reduced states
-epsilon = 1e-3;
-
+param.range = 10; % n points in front, n points back
+param.weightPVI = 0; % weight of PVI over reduced states
+param.epsilon = 1e-3;
+method = 1; % 1.weighted PVI; 2.cosine similarity; 3.local resolution
 if isPS
-    selRange = rangeSelection(range, iStep, size(rBasis, 2));   
-    trainState = [weightPVI*trainPVI(selRange)' /(targetPVI(iStep) + epsilon); ...
-        rBasis(:,selRange') ./ (sum(stateReduced) + epsilon) ];
-    targetState = [weightPVI*targetPVI(iStep) /(targetPVI(iStep) + epsilon); ...
-        stateReduced ./ (sum(stateReduced) + epsilon)];
-    tempDist = dist([targetState,trainState]); % Q by Q matrix
-    distance = tempDist(1,2:end); % first row of dist matrix
-    [~, min_index] = min(distance);
-    selectPoint = selRange(min_index);
-    selectPoint = stuckAvoid(psRecord, selectPoint, iStep, size(rBasis, 2));
+    switch method
+        case 1,
+            selectPoint = weightedPVI(iStep, psRecord, trainPVI, targetPVI, rBasis, stateReduced, param);
+        case 2,
+            selectPoint = cosineSimilarity(iStep, psRecord, rBasis, stateReduced, param);
+        case 3,
+            selectPoint = localResolution(iStep, psRecord, trainPVI, targetPVI, rBasis, stateReduced, param);
+        otherwise,
+            error('no matching method!\n');
+    end
 else
     selectPoint = iStep;
 end
 end
+
+function [selectPoint] = weightedPVI(iStep, psRecord, trainPVI, targetPVI, rBasis, stateReduced, param)
+selRange = rangeSelection(param.range, iStep, size(rBasis, 2));
+trainState = [param.weightPVI*trainPVI(selRange)' /(targetPVI(iStep) + param.epsilon); ...
+    rBasis(:,selRange') ./ (sum(stateReduced) + param.epsilon) ];
+targetState = [param.weightPVI*targetPVI(iStep) /(targetPVI(iStep) + param.epsilon); ...
+    stateReduced ./ (sum(stateReduced) + param.epsilon)];
+tempDist = dist([targetState,trainState]); % Q by Q matrix
+distance = tempDist(1,2:end); % first row of dist matrix
+[~, min_index] = min(distance);
+selectPoint = selRange(min_index);
+selectPoint = stuckAvoid(psRecord, selectPoint, iStep, size(rBasis, 2));
+end
+
+function [selectPoint] = cosineSimilarity(iStep, psRecord, rBasis, stateReduced, param)
+selRange = rangeSelection(param.range, iStep, size(rBasis, 2));
+trainState = normc(rBasis(:,selRange')); % select the states in the range and normalized it
+targetState = normc(stateReduced);
+cosine_angle = trainState' * targetState;
+% [~, max_index] = max(cosine_angle);
+max_index = find(abs(cosine_angle - max(cosine_angle))<0.0001);
+[~,select_index] = min(abs(max_index - iStep));
+selectPoint = selRange(select_index);
+selectPoint = stuckAvoid(psRecord, selectPoint, iStep, size(rBasis, 2));
+end
+
+function [selectPoint] = localResolution()
+end
+
 
 function [PVI] = calPVI(ctrlSchedule, time)
 timeInterval = [0; diff(time)];

@@ -7,23 +7,25 @@ trainFile = [caseDir, 'data/stateVariable_' int2str(trainingSchedule) '.mat'];
 oputDir = [caseDir, 'data/figure_output/'];
 if isTraining % full-order simulation
     eval(['load ' dataFile]);
+    time_train = time;
 else % reduced-order simulation
     eval(['load ' reconFile]);
     eval(['load ' trainFile ' snapShots']);
     snapShots_train = snapShots;
-    eval(['load ' dataFile ' snapShots']);
+    time_train = time; % Oct.21,2015
+    eval(['load ' dataFile ' snapShots time']);
 end
 eval(['load ' caseDir, 'data/', caseName '.mat']); % load caseObj
 
 %% plot injection rate
 if isTraining
-    wellRatePlot(oputDir, caseName, wellRate, time, schedule);
+    wellRatePlot(oputDir, caseName, wellRate, time_train, schedule);
     stateMatrix = snapShots;
 else
     stateMatrix = stateRecord; % convert the name of variable
 end
 %% validate plot time
-plot_time_step = timeValidate(time, plotTime);
+plot_time_step = timeValidate(time_train, plotTime);
 %% plot pressure/saturation map
 [ center_res_data ] = centerRes(stateMatrix, caseObj.nComp, caseObj.cen_x, ...
     caseObj.cen_y, caseObj.res_x, caseObj.res_y, caseObj.res_z); % get center info
@@ -40,7 +42,7 @@ satCompare(oputDir, caseName, schedule, stateRecord, snapShots, plot_time_step, 
     caseObj.cen_y, caseObj.res_x, caseObj.res_y, caseObj.res_z); 
 [ true_center_data ] = centerRes(snapShots, caseObj.nComp, caseObj.cen_x, ...
     caseObj.cen_y, caseObj.res_x, caseObj.res_y, caseObj.res_z); 
-[trainDiff, testDiff] = dataDiff(center_res_data, train_center_data, true_center_data);
+[trainDiff, testDiff] = dataDiff(center_res_data, train_center_data, true_center_data, time, time_train);
 % plot differnce map between training and true test
 centerMapPlot(oputDir, 1, 1, caseName, trainDiff, caseObj.dx, caseObj.dy,...
     caseObj.dz, caseObj.cen_x, caseObj.cen_y, caseObj.cen_z, axis, slice, ...
@@ -50,11 +52,9 @@ centerMapPlot(oputDir, isTraining, 1, caseName, testDiff, caseObj.dx, caseObj.dy
     caseObj.dz, caseObj.cen_x, caseObj.cen_y, caseObj.cen_z, axis, slice, ...
     comp, plot_time_step, plotTime, schedule);
 
-%% plot the total mobility
-mobilityPlot()
+end
+end
 
-end
-end
 
 function [ center_res_data ] = centerRes(stateMatrix, nComp, cen_x, cen_y, ...
     res_x, res_y, res_z)
@@ -192,9 +192,18 @@ figure_name = [oputDir caseName '_schedule_' int2str(schedule) '_' int2str(plotT
 eval(['print -dpng -r300 -cmyk -zbuffer ' figure_name '.png']);
 end
 
-function [trainDiff, testDiff] = dataDiff(center_res_data, train_center_data, true_center_data)
+function [trainDiff, testDiff] = dataDiff(center_res_data, train_center_data, true_center_data, time, time_train)
 trainDiff = abs(center_res_data - train_center_data);
+if size(time_train, 1) ~= size(time, 1)
+    [true_center_data] = time_interp(true_center_data, time, time_train);
+end
 testDiff = abs(center_res_data - true_center_data);
+end
+
+function [true_center_data] = time_interp(true_center_data, time, time_train)
+temp_1 = permute(true_center_data, [5,2,3,4,1]);
+temp_2 = interp1(time, temp_1, time_train);
+true_center_data = permute(temp_2, [5,2,3,4,1]);
 end
 
 

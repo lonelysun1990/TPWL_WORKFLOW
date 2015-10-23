@@ -7,6 +7,7 @@ caseObj.cen_x = 25;
 caseObj.cen_y = 25;
 caseObj.cen_z = 10;
 caseObj.nComp = 2;
+caseObj.nPhase = 2;
 
 caseObj.dx = 216:436:10684;
 caseObj.dy = 216:436:10684;

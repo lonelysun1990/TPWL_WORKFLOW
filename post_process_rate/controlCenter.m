@@ -3,12 +3,12 @@ function [] = controlCenter()
 clear *;
 clc;
 %% switches
-loadTraining = 1;
+loadTraining = 0;
 loadFullOrder = 0;
 reRunTraining = 0;
 reRunFullOrder = 0;
 isPOD = 0;
-isTPWL = 0;
+isTPWL = 1;
 isPS = 1; % point selection
 isTPWLfull = 0;
 isPlotResult = 1;
@@ -20,8 +20,8 @@ caseName = 'CO2_2COMP';
 % caseName = 'CO2_SYN';
 caseDir = [rootDir caseName '/'];
 templateDir = ['../input_template/' caseName '/'];
-trainingSchedule = [1031, 1032];
-targetSchedule = 1033;
+trainingSchedule = [1061, 1062];
+targetSchedule = 1063;
 
 %% operations
 trainingAD(loadTraining, reRunTraining, caseDir, caseName, ...

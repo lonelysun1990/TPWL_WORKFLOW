@@ -31,7 +31,8 @@ temperature = caseObj.temp; % K
 WIs = caseObj.WIs;
 wellPerf = caseObj.nWellPerf;
 timeStep = size(WBstateRecord, 2);
-% mobility_layer = 15;
+mobility_cal = 1; % switch to turn on total mobility calculation
+mobility_layer = 15;
 
 %% flash workflow
 [oDataRC] = doFlash(flashDir, exeDir, 'RC', WBstateRecord, WBindices, ...
@@ -39,31 +40,55 @@ timeStep = size(WBstateRecord, 2);
 [oDataSC] = doFlash(flashDir, exeDir, 'SC', WBstateRecord, WBindices, ...
     nComp, nWellBlock, temperature, timeStep);
 % get total mobility of the layer
-% if isTPWL
-%     [layerStateRecord, layerIndices] = layerSelect(stateRecord, mobility_layer, caseObj);
-% else
-%     [layerStateRecord, layerIndices] = layerSelect(snapShots, mobility_layer, caseObj);
-% end
-% [resDataRC] = doFlash(flashDir, exeDir, 'RC', layerStateRecord, layerIndices, ...
-%     nComp, caseObj.res_x*caseObj.res_y, temperature, timeStep);
+if mobility_cal == 1
+if isTPWL
+    [layerStateRecord, layerIndices] = layerSelect(stateRecord, mobility_layer, caseObj);
+else
+    [layerStateRecord, layerIndices] = layerSelect(snapShots, mobility_layer, caseObj);
+end
+[resDataRC] = doFlash(flashDir, exeDir, 'RC', layerStateRecord, layerIndices, ...
+    nComp, caseObj.res_x*caseObj.res_y, temperature, timeStep);
+%% calculate the total mobility
+[total_mob] = layerMobility(resDataRC, caseObj);
+end
+
 % get well information
 [wellCtrl, ctrlMode] = scheduleConvert(ioDir, schedule, time);
 % wellVar = wellRate(oDataRC, oDataSC,  nWell, timeStep, WI, nComp, wellCtrl, ctrlMode);
 wellVar = wellRate_ResCond(oDataRC, oDataSC,  nWell, timeStep, WIs, nComp, ...
     wellCtrl, ctrlMode, wellPerf);
 if isTPWL % TPWL
-    eval(['save -v7.3 ' ioDir 'recon_well_' int2str(schedule) ' wellVar time']);
-%     eval(['save -v7.3 ' ioDir 'priVarTPWL_' int2str(schedule) ' resDataRC -append']);
+    eval(['save -v7.3 ' ioDir 'recon_well_' int2str(schedule) ' wellVar total_mob time']);
+    eval(['save -v7.3 ' ioDir 'priVarTPWL_' int2str(schedule) ' resDataRC -append']);
 else % full order model reference solution
-    eval(['save -v7.3 ' ioDir 'full_well_' int2str(schedule) ' wellVar time']);
-%     eval(['save -v7.3 ' ioDir 'stateVariable_' int2str(schedule) ' resDataRC -append']);
+    eval(['save -v7.3 ' ioDir 'full_well_' int2str(schedule) ' wellVar total_mob time']);
+    eval(['save -v7.3 ' ioDir 'stateVariable_' int2str(schedule) ' resDataRC -append']);
 end
 fprintf(['flash ',int2str(schedule),' finished!\n']);
 end
 
+function [total_mob] = layerMobility(resDataRC, caseObj)
+nCell = size(resDataRC, 2);
+timeStep = size(resDataRC, 1);
+nComp = caseObj.nComp;
+% nPhase = caseObj.nPhase;
+wat_sat = reshape(resDataRC(:,:,7),timeStep,nCell); % in this case water saturation
+[row, col]=find(wat_sat~=1); % water saturation is not 1, which means CO2 is in it
+idx = sub2ind(size(wat_sat), row, col);
+mask = zeros(size(wat_sat));
+mask(idx)=1;
+mob = reshape(resDataRC(:,:,15),timeStep, nCell) .* mask; % CO2 mobility
+den = reshape(resDataRC(:,:,13),timeStep, nCell) .* mask; % CO2 molar density
+den_mob = den .* mob;
+total_mob = sum(den_mob, 2);
+end
+
 function [layerStateRecord, layerIndices] = layerSelect(stateRecord, mobility_layer, caseObj)
+nComp = caseObj.nComp;
 layerIndices = (caseObj.res_x * caseObj.res_y*(mobility_layer -1)+1:caseObj.res_x * caseObj.res_y*mobility_layer)';
-temp_index = reshape([layerIndices*2-1, layerIndices*2]',[], 1);
+temp_layer = (layerIndices - 1) * ones(1,nComp) * nComp + ones(size(layerIndices)) * (1:nComp);% Idea from Chu Liu
+temp_index = reshape(temp_layer', [], 1);
+% temp_index = reshape([layerIndices*2-1, layerIndices*2]',[], 1);
 layerStateRecord = stateRecord(temp_index,:);
 end
 

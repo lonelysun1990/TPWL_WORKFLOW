@@ -9,7 +9,7 @@ WELL_RATES_AT
 RC /
 
 DIMENS
-46 46 400
+46 46 100
 /
 --INCLUDE
 --depth.in /
