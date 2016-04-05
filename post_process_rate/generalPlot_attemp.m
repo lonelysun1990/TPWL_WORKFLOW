@@ -25,7 +25,8 @@ else
     stateMatrix = stateRecord; % convert the name of variable
 end
 %% validate plot time
-plot_time_step = timeValidate(time_train, plotTime);
+plot_time_step = timeValidate(time_train, plotTime); % 1st training, & TPWL
+plot_time_step_full = timeValidate(time, plotTime); % full order test
 %% plot pressure/saturation map
 [ center_res_data ] = centerRes(stateMatrix, caseObj.nComp, caseObj.cen_x, ...
     caseObj.cen_y, caseObj.res_x, caseObj.res_y, caseObj.res_z); % get center info
@@ -36,7 +37,7 @@ centerMapPlot(oputDir, isTraining, 0, caseName, center_res_data, caseObj.dx, cas
 
 if ~isTraining
 %% plot the 45 degree line for CO2 saturation
-satCompare(oputDir, caseName, schedule, stateRecord, snapShots, plot_time_step, plotTime);
+satCompare(oputDir, caseName, schedule, stateRecord, snapShots, plot_time_step, plot_time_step_full, plotTime);
 %% plot difference map
 [ train_center_data ] = centerRes(snapShots_train, caseObj.nComp, caseObj.cen_x, ...
     caseObj.cen_y, caseObj.res_x, caseObj.res_y, caseObj.res_z); 
@@ -160,17 +161,17 @@ if isempty(plot_time_step)
 end
 end
 
-function satCompare(oputDir, caseName, schedule, stateRecord, snapShots, plot_time_step, plotTime)
+function satCompare(oputDir, caseName, schedule, stateRecord, snapShots, plot_time_step, plot_time_step_full, plotTime)
 set(0, 'DefaultAxesFontSize', 20);
 % 45 degree line for pressure
 figure()
-range = max(snapShots(1:2:end-1,plot_time_step)) - min(snapShots(1:2:end-1,plot_time_step));
-min_p = min(snapShots(1:2:end-1,plot_time_step)) - range * 0.2;
-max_p = max(snapShots(1:2:end-1,plot_time_step)) + range * 0.2;
+range = max(snapShots(1:2:end-1,plot_time_step_full)) - min(snapShots(1:2:end-1,plot_time_step_full));
+min_p = min(snapShots(1:2:end-1,plot_time_step_full)) - range * 0.2;
+max_p = max(snapShots(1:2:end-1,plot_time_step_full)) + range * 0.2;
 line = linspace(min_p, max_p);
 plot(line,line,'r--','linewidth',2);
 hold on;
-plot(snapShots(1:2:end-1,plot_time_step), stateRecord(1:2:end-1,plot_time_step),'b.','markersize',15);
+plot(snapShots(1:2:end-1,plot_time_step_full), stateRecord(1:2:end-1,plot_time_step),'b.','markersize',15);
 legend('45 degree line','POD-TPWL vs. AD-GPRS','location','best');
 xlabel('Pressure AD-GPRS (psi)');
 ylabel('Pressure POD-TPWL (psi)');
@@ -180,10 +181,10 @@ eval(['print -dpng -r300 -cmyk -zbuffer ' figure_name '.png']);
 
 % 45 degree line for pressure
 figure()
-line = linspace(min(snapShots(2:2:end,plot_time_step))*0.97,max(snapShots(2:2:end,plot_time_step))*1.02);
+line = linspace(min(snapShots(2:2:end,plot_time_step_full))*0.97,max(snapShots(2:2:end,plot_time_step_full))*1.02);
 plot(line,line,'r--','linewidth',2);
 hold on;
-plot(snapShots(2:2:end,plot_time_step), stateRecord(2:2:end,plot_time_step),'b.','markersize',15);
+plot(snapShots(2:2:end,plot_time_step_full), stateRecord(2:2:end,plot_time_step),'b.','markersize',15);
 legend('45 degree line','POD-TPWL vs. AD-GPRS','location','best');
 xlabel('CO_{2} molar fraction AD-GPRS');
 ylabel('CO_{2} molar fraction POD-TPWL');
@@ -193,11 +194,11 @@ eval(['print -dpng -r300 -cmyk -zbuffer ' figure_name '.png']);
 end
 
 function [trainDiff, testDiff] = dataDiff(center_res_data, train_center_data, true_center_data, time, time_train)
-trainDiff = abs(center_res_data - train_center_data);
 if size(time_train, 1) ~= size(time, 1)
     [true_center_data] = time_interp(true_center_data, time, time_train);
 end
 testDiff = abs(center_res_data - true_center_data);
+trainDiff = abs(true_center_data - train_center_data); % Nov 18,2015
 end
 
 function [true_center_data] = time_interp(true_center_data, time, time_train)

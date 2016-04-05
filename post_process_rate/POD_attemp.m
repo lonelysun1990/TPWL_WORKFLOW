@@ -1,6 +1,5 @@
 % attemp to reduce the model through SVD
-function [] = POD_attemp(caseDir, caseName, trainingSchedule)
-% trainingSchedule = [500,510]
+function [] = POD_attemp(caseDir, caseName, trainingSchedule, isMultiTrain)
 ioDir = [caseDir 'data/'];
 eval(['load ' ioDir caseName '.mat']);
 model = 1;% compositional model
@@ -12,10 +11,15 @@ nCell = caseObj.res_x * caseObj.res_y * caseObj.res_z;
 [stateUnion] = loadStateVariable(ioDir, trainingSchedule, nComp, nCell);
 % SVD variable by varible P, C1, C2, ...
 [phi, phiT] = svdDecomp(stateUnion, nComp);
-rBasis = basisReduce(ioDir, trainingSchedule, phiT, nCell, nComp);
-[Jr, Accr, dQdur] = derivReduce(ioDir, trainingSchedule, phi, ...
-    nCell, nComp, 'PG');
-eval(['save -v7.3 ' ioDir 'reducedInfo_' int2str(trainingSchedule(1)) ' Jr Accr dQdur phi phiT rBasis']);
+
+for iCase = 1:size(trainingSchedule,2)
+    if iCase == 1 || isMultiTrain
+        rBasis = basisReduce(ioDir, trainingSchedule(iCase), phiT, nCell, nComp);
+        [Jr, Accr, dQdur] = derivReduce(ioDir, iCase, trainingSchedule, phi, ...
+            nCell, nComp, 'PG');
+        eval(['save -v7.3 ' ioDir 'reducedInfo_' int2str(trainingSchedule(iCase)) ' Jr Accr dQdur phi phiT rBasis']);
+    end
+end
 end
 
 function [stateUnion] = loadStateVariable(ioDir, trainingSchedule, nComp, nCell)
@@ -51,7 +55,7 @@ phiT = phi';
 end
 
 function [nBasis] = energyCriteria(iComp, S, basisInds)
-lpls_dirty = [80; 80; 80];
+lpls_dirty = [80; 80; 80]; % 80,80,80
 nBasis = lpls_dirty(iComp);
 %     lambda = diag(S);
 %     energy = cumsum(lambda)/sum(lambda); % energy criteria, not used right now
@@ -60,8 +64,8 @@ nBasis = lpls_dirty(iComp);
 %     nBasis = temp(1);
 end
 
-function [rBasis] = basisReduce(ioDir, trainingSchedule, phiT, nCell, nComp)
-eval(['load ' ioDir 'stateVariable_' int2str(trainingSchedule(1)) '.mat snapShots timeStep']);
+function [rBasis] = basisReduce(ioDir, schedule, phiT, nCell, nComp)
+eval(['load ' ioDir 'stateVariable_' int2str(schedule) '.mat snapShots timeStep']);
 % tempState = reshape(snapShots', timeStep + 1, nComp, nCell);
 % statePermute = permute(tempState, [3, 2, 1]);
 % fullBasis = reshape(statePermute, nCell * nComp, timeStep + 1);
@@ -69,12 +73,12 @@ fullBasis = snapShots;
 rBasis = phiT * fullBasis;
 end
 
-function [Jr, Accr, dQdur] = derivReduce(ioDir, trainingSchedule, phi, ...
+function [Jr, Accr, dQdur] = derivReduce(ioDir, iCase, trainingSchedule, phi, ...
     nCell, nComp, projM)
 if nargin < 4, projM = 'PG'; end % set Petrov-Galerkin as default
-eval(['load ' ioDir 'Matrix_Acc_' int2str(trainingSchedule(1)) '.mat Acc']);
-eval(['load ' ioDir 'Matrix_J_' int2str(trainingSchedule(1)) '.mat J']);
-eval(['load ' ioDir 'Matrix_U_' int2str(trainingSchedule(1)) '.mat dQdu']);
+eval(['load ' ioDir 'Matrix_Acc_' int2str(trainingSchedule(iCase)) '.mat Acc']);
+eval(['load ' ioDir 'Matrix_J_' int2str(trainingSchedule(iCase)) '.mat J']);
+eval(['load ' ioDir 'Matrix_U_' int2str(trainingSchedule(iCase)) '.mat dQdu']);
 % different projection method
 if strcmp(projM, 'PG')
     [Jr, Accr, dQdur] = projPG(phi, J, Acc, dQdu, nCell, nComp);

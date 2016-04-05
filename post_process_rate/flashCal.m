@@ -32,7 +32,7 @@ WIs = caseObj.WIs;
 wellPerf = caseObj.nWellPerf;
 timeStep = size(WBstateRecord, 2);
 mobility_cal = 1; % switch to turn on total mobility calculation
-mobility_layer = 15;
+mobility_layer = 3;
 
 %% flash workflow
 [oDataRC] = doFlash(flashDir, exeDir, 'RC', WBstateRecord, WBindices, ...

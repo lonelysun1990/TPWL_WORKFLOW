@@ -8,7 +8,7 @@
 #PBS -q default
 #
 # set the wall time
-#PBS -l walltime=00:01:00
+#PBS -l walltime=00:02::00
 #
 # export the environment
 #PBS -V

@@ -5,11 +5,12 @@ iDir = [caseDir 'data/'];
 oDir = [iDir 'figure_output/'];
 [timeRec, well] = readResults(iDir, targetSchedule, trainingSchedule, 'wellVar');
 % plotting part
-plotToolKit(oDir, caseName, targetSchedule, timeRec, well, 'wellVar');
+plotToolKit(oDir, caseName, targetSchedule,trainingSchedule, timeRec, well, 'wellVar');
 
 % top layer mobility over time
 [timeRec, well] = readResults(iDir, targetSchedule, trainingSchedule, 'total_mob');
-plotToolKit(oDir, caseName, targetSchedule, timeRec, well, 'total_mob');
+plotToolKit(oDir, caseName, targetSchedule, trainingSchedule, timeRec, well, 'total_mob');
+% later
 end
 
 function [timeRec, well] = readResults(iDir, targetSchedule, trainingSchedule, plotVar)
@@ -26,34 +27,45 @@ eval(['well.full = ' plotVar ';']);
 eval(['clear time ' plotVar]);
 
 %% training from AD-GPRS
-eval(['load ' iDir 'full_well_' int2str(trainingSchedule(1)) '.mat time ' plotVar]);
-timeRec.ref = time;
-eval(['well.ref = ' plotVar ';']);
-eval(['clear time ' plotVar]);
+for iRef = 1 : size(trainingSchedule, 2)
+    eval(['load ' iDir 'full_well_' int2str(trainingSchedule(iRef)) '.mat time ' plotVar]);
+%     timeRec.ref = time;
+    eval(['timeRec.ref_' int2str(iRef) ' = time;']);
+    eval(['well.ref_' int2str(iRef) ' = ' plotVar ';']);
+    eval(['clear time ' plotVar]);
+end
 end
 
-function [] = plotToolKit(oDir, caseName, targetSchedule, timeRec, well, plotVar)
+function [] = plotToolKit(oDir, caseName, targetSchedule, trainingSchedule, timeRec, well, plotVar)
 nWell = size(well.recon,2);
 set(0, 'DefaultAxesFontSize', 20);
+print_training = 2; % 1. print one training, 2. print multiple training
 for iWell = 1:nWell
-figure()
-hold on;
-plot(timeRec.full, well.full(:,iWell),'ro--','linewidth',2);
-plot(timeRec.ref, well.ref(:,iWell),'k--','linewidth',2);
-plot(timeRec.recon, well.recon(:,iWell),'b^--','linewidth',2);
-legend('ADGPRS','Training','POD-TPWL','location','best');
+    figure()
+    hold on;
+    h_full = plot(timeRec.full, well.full(:,iWell),'ro--','linewidth',2);
+    if print_training == 1
+        plot(timeRec.ref_1, well.ref_1(:,iWell),'k--','linewidth',2);
+    else
+        grey = [0.7,0.7,0.7];
+        for iRef = 1 : size(trainingSchedule, 2)
+            eval(['h_ref = plot(timeRec.ref_' int2str(iRef) ', well.ref_' int2str(iRef) '(:,iWell),''color'', grey,''linewidth'',2);']);
+        end
+    end
+h_recon = plot(timeRec.recon, well.recon(:,iWell),'b^--','linewidth',2);
+legend([h_full, h_ref, h_recon],{'ADGPRS','Training','POD-TPWL'},'location','best');
 if strcmp(plotVar, 'wellVar')
     axis([0 max(timeRec.recon) ...
-	floor(min([well.ref(:,iWell); well.full(:, iWell); well.recon(:,iWell)])*0.99) ...
-	ceil(max([well.ref(:,iWell); well.full(:, iWell); well.recon(:,iWell)])*1.01) ...
+	floor(min([well.ref_1(:,iWell); well.full(:, iWell); well.recon(:,iWell)])*0.99) ...
+	ceil(max([well.ref_1(:,iWell); well.full(:, iWell); well.recon(:,iWell)])*1.01) ...
 	]);
     xlabel('Time (day)');
     ylabel('Well BHP (psia)');
     figure_name = [oDir, caseName, '_schedule_' int2str(targetSchedule) '_well_' int2str(iWell)];
-else
+else % total mobility
     axis([0 max(timeRec.recon) ...
-	floor(min([well.ref; well.full; well.recon])*0.99) ...
-	ceil(max([well.ref; well.full; well.recon])*1.01) ...
+	floor(min([well.ref_1; well.full; well.recon])*0.99) ...
+	ceil(max([well.ref_1; well.full; well.recon])*1.01) ...
 	]);
     xlabel('Time (day)');
     ylabel('Total mobility (lb mol RB^{-1} cP^{-1})');

@@ -1,7 +1,7 @@
 % read the Jacobi matrix at each time step
-function [] = readJacobi_attemp(caseName, schedule, caseDir)
+function [] = readJacobi_attemp(caseName, schedule, caseDir, iCase)
 
-ijacbDir = [caseDir 'training_1/'];% directory to input jacobian
+ijacbDir = [caseDir 'training_' int2str(iCase) '/'];% directory to input jacobian
 ioDir = [caseDir 'data/'];
 
 fprintf(['loading Jacobian for schedule ',int2str(schedule),':\n']);

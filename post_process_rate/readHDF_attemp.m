@@ -1,4 +1,4 @@
-function [] = readHDF_attemp(primaryTraining, schedule, caseDir, scheduleDir, caseName)% just for now
+function [] = readHDF_attemp(primaryTraining, isMultiTrain, schedule, caseDir, scheduleDir, caseName)% just for now
 % attemp to run ADPGRS and read HDF5 output file
 
 iDir = [caseDir, scheduleDir]; % manually change right now
@@ -12,7 +12,7 @@ wellPerf = caseObj.nWellPerf;
 nComp = caseObj.nComp;
 %% load HDF file
 fprintf(['loading HDF file for schedule ',int2str(schedule),':\n']);
-if primaryTraining % if it is primary training
+if primaryTraining || isMultiTrain % if it is primary training
     h5file = [iDir 'OUTPUT_gradient_with_DISCRETE.sim.h5'];
 else % if not, with no dirivatives (but state file do not have a difference)
     h5file = [iDir 'OUTPUT.sim.h5'];

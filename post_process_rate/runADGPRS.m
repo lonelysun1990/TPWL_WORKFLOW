@@ -1,11 +1,11 @@
-function [finished] = runADGPRS(isTraining, schedule, caseDir)
+function [finished] = runADGPRS(isTraining, schedule, caseDir, isMultiTrain)
 % schedule here is a vector
 % check which system we are in
 [~, k2] = system('uname -a'); 
 [~, k4] = system('ver');
 %% run ADGPRS
 if strfind(k2, 'Linux') % Linux OS
-    [jobID, jobStatus] = runAD_linux(isTraining, schedule, caseDir);
+    [jobID, jobStatus] = runAD_linux(isTraining, schedule, caseDir, isMultiTrain);
 elseif strfind(k4, 'Microsoft Windows')% Windows OS
     jobStatus = runAD_win(1, isTraining, schedule);
 end
@@ -40,7 +40,7 @@ for iCase = 1: size(jobStatus,1)
 end
 end
 
-function [jobID, jobStatus] = runAD_linux(isTraining, schedule, caseDir)
+function [jobID, jobStatus] = runAD_linux(isTraining, schedule, caseDir, isMultiTrain)
 jobStatus = zeros(length(schedule),1);
 jobID = zeros(size(jobStatus));
 for iCase = 1 : size(jobStatus,1)
@@ -51,7 +51,9 @@ for iCase = 1 : size(jobStatus,1)
         scheduleDir = ['target_',int2str(iCase),'/']; % just for now
     end
     workDir = cd([caseDir, scheduleDir]);
-    if isTraining && iCase == 1 % primary training case
+    % modified 10-24-2015, add multiple training with derivatives
+    % either primary training case, or multi-trianing derivative is on
+    if (isTraining && iCase == 1) || (isTraining && isMultiTrain) % 
         [k1, k2] = system(['ssh cees-rcf "cd ' pwd '; qsub optimize.sh"']);
         jobID(iCase) = sscanf(k2, '%i',[1,1]);
     else % else non-primary training or full order test

@@ -5,19 +5,20 @@ rootDir = '../rate_control/';
 
 %
 % caseName = 'CO2_SYN';
-caseName = 'CO2_2COMP';
+% caseName = 'CO2_2COMP';
+caseName = 'CO2_SYN_4Well';
 %
 caseDir = [rootDir caseName '/'];
 templateDir = ['../input_template/' caseName '/'];
 iDir = ['../model_data/' caseName '/well/'];
 oDir = [caseDir, 'data/'];
 %
-schedule = 1064;
+schedule = 1202;
 nWells = 4;
 interNum = 8;% number of interval
 ctrlMode = 'rate';
 genCtrl = 'file_percent'; % 1. file; 2. pattern generate; 
-totalRate = 8974.68; % 8974.68; 3255 % reservoir m3/day
+totalRate = 4882.5; % 8974.68; 3255 % reservoir m3/day
 [interLen, ctrlParam, well_input] = patternGen(iDir, genCtrl, interNum, nWells, totalRate);
 inputAD(templateDir, ctrlMode, ctrlParam, schedule, nWells, interLen);
 matFile(oDir, interLen, ctrlParam, ctrlMode, schedule);
